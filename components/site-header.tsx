@@ -24,14 +24,14 @@ function applyTheme(t: string) {
 
 export function ThemeToggle() {
   // Fixed init avoids a hydration mismatch; the stored value syncs pre-paint below.
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState("dark");
   // Re-apply after hydration. Runs before paint, so no visible flash.
   useLayoutEffect(() => {
     try {
       const t =
         localStorage.getItem("baw-theme") ??
         document.documentElement.getAttribute("data-theme") ??
-        "light";
+        "dark";
       document.documentElement.setAttribute("data-theme", t);
       // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-once sync from localStorage/DOM
       setTheme(t);

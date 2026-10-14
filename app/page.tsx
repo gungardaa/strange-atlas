@@ -35,9 +35,6 @@ export default function Home() {
               <DiceIcon /> Find me something strange
             </Button>
           </div>
-          <p className="mt-4 font-mono text-xs text-text-muted">
-            20.5°N 10.5°E · WORLD VIEW · ALL MARKERS LIVE
-          </p>
         </div>
         <div aria-hidden className="graticule crosshair relative hidden overflow-hidden rounded-md border border-border bg-surface-secondary p-6 md:block">
           <div className="flex h-44 items-center justify-center gap-8">
