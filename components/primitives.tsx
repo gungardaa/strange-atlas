@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { SearchIcon } from "./icons";
 
 // One variant function serves <button> and <Link>. No variant library.
@@ -11,7 +11,7 @@ export function btnClasses(variant: BtnVariant = "secondary", size: BtnSize = "m
     "inline-flex items-center justify-center gap-2 font-medium transition-colors rounded-md active:brightness-95";
   const sizes = {
     sm: "tappable min-h-[36px] px-3 py-1.5 text-sm",
-    md: "px-5 py-2.5 text-[15px]",
+    md: "tappable min-h-[36px] px-5 py-2.5 text-[15px]",
   } as const;
   const variants = {
     primary: "bg-accent text-white dark:text-[#0E1724] hover:brightness-110",
@@ -24,23 +24,16 @@ export function btnClasses(variant: BtnVariant = "secondary", size: BtnSize = "m
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: BtnVariant;
   size?: BtnSize;
-  loading?: boolean;
 };
 
-export function Button({ variant, size, loading, disabled, className = "", children, ...rest }: ButtonProps) {
+export function Button({ variant, size, disabled, className = "", children, ...rest }: ButtonProps) {
   return (
     <button
       type="button"
       className={`${btnClasses(variant, size)} ${className}`}
-      disabled={disabled || loading}
-      aria-busy={loading || undefined}
+      disabled={disabled}
       {...rest}
     >
-      {loading && (
-        <svg aria-hidden viewBox="0 0 16 16" className="baw-spinner h-4 w-4">
-          <circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="10 30" />
-        </svg>
-      )}
       {children}
     </button>
   );
@@ -69,10 +62,10 @@ export function FilterChip({
   );
 }
 
-export function Chip({ swatch, glyph, children }: { swatch?: string; glyph?: ReactNode; children: ReactNode }) {
+export function Chip({ glyph, children }: { glyph?: ReactNode; children: ReactNode }) {
   return (
     <span className="inline-flex items-center gap-1.5 rounded-sm border border-border bg-surface-secondary px-2.5 py-0.5 text-xs font-medium text-text-secondary">
-      {glyph ?? (swatch ? <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: swatch }} /> : null)}
+      {glyph}
       {children}
     </span>
   );
@@ -113,7 +106,7 @@ export function Container({
 }) {
   const Tag = as as "div";
   return (
-    <Tag id={id} className={`mx-auto w-full ${width === "page" ? "max-w-6xl" : "max-w-3xl"} px-4 ${className}`}>
+    <Tag id={id} className={`mx-auto w-full ${width === "page" ? "max-w-6xl" : "max-w-3xl"} px-4 sm:px-6 lg:px-8 ${className}`}>
       {children}
     </Tag>
   );
@@ -124,59 +117,20 @@ export function Eyebrow({ children }: { children: ReactNode }) {
   return <p className="font-mono text-xs uppercase tracking-widest text-text-muted">{children}</p>;
 }
 
-export function SectionHead({ id, eyebrow, title, lede, as = "h2" }: { id?: string; eyebrow?: ReactNode; title: string; lede?: string; as?: "h1" | "h2" }) {
+export function SectionHead({ id, eyebrow, title, as = "h2" }: { id?: string; eyebrow?: ReactNode; title: string; as?: "h1" | "h2" }) {
   const Tag = as as "h2";
   return (
     <div>
       {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
       <Tag id={id} className="mt-1 font-display text-2xl font-bold tracking-tight text-text-primary">{title}</Tag>
-      {lede ? <p className="mt-1 text-text-secondary">{lede}</p> : null}
-    </div>
-  );
-}
-
-export function Divider({ className = "" }: { className?: string }) {
-  return <hr className={`border-border ${className}`} />;
-}
-
-export function Field({
-  label,
-  htmlFor,
-  hint,
-  error,
-  children,
-}: {
-  label: string;
-  htmlFor: string;
-  hint?: string;
-  error?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div>
-      <label htmlFor={htmlFor} className="mb-1 block text-sm font-medium text-text-primary">
-        {label}
-      </label>
-      {children}
-      {hint && !error ? <p className="mt-1 text-xs text-text-muted">{hint}</p> : null}
-      {error ? (
-        <p role="alert" className="mt-1 text-xs font-medium text-text-primary">
-          Cannot continue. {error}
-        </p>
-      ) : null}
     </div>
   );
 }
 
 const inputClasses = (invalid?: boolean) =>
-  `w-full rounded-sm border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted transition-colors hover:border-accent focus:border-accent ${
+  `tappable min-h-[36px] w-full rounded-sm border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted transition-colors hover:border-accent focus:border-accent ${
     invalid ? "border-2 border-text-primary" : "border-border"
   }`;
-
-export function TextInput(props: InputHTMLAttributes<HTMLInputElement> & { invalid?: boolean }) {
-  const { invalid, ...rest } = props;
-  return <input aria-invalid={invalid || undefined} className={inputClasses(invalid)} {...rest} />;
-}
 
 export function SearchField({
   id,

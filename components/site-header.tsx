@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { MoonIcon, SunIcon } from "./icons";
 
 const LINKS = [
@@ -59,18 +59,29 @@ export function ThemeToggle() {
 export default function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  // Escape closes the mobile menu and returns focus to its button.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (ev: KeyboardEvent) => {
+      if (ev.key !== "Escape") return;
+      setOpen(false);
+      document.getElementById("menu-button")?.focus();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open ]);
   return (
-    <header className="border-b border-border">
+    <header className="sticky top-0 z-40 border-b border-border bg-background">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
-        <Link
-          href="/"
-          className="flex items-center gap-2 font-display text-lg font-bold tracking-tight text-text-primary"
-        >
-          <Image src="/logo.png" alt="The Strange Atlas logo" width={32} height={32} className="h-8 w-8" />
-          The Strange Atlas
-        </Link>
+          <Link
+            href="/"
+            className="flex min-w-0 items-center gap-2 font-display text-base font-bold tracking-tight text-text-primary sm:text-lg"
+          >
+            <Image src="/logo.png" alt="The Strange Atlas logo" width={32} height={32} className="h-8 w-8 shrink-0" />
+            <span className="truncate">The Strange Atlas</span>
+          </Link>
         <div className="flex items-center gap-6">
-          <nav aria-label="Primary" className="hidden items-center gap-8 md:flex">
+          <nav aria-label="Primary" className="hidden items-center gap-8 lg:flex">
             {LINKS.map((l) => (
               <Link
                 key={l.href}
@@ -86,10 +97,12 @@ export default function SiteHeader() {
             <ThemeToggle />
             <button
               type="button"
+              id="menu-button"
               onClick={() => setOpen(!open)}
               aria-expanded={open}
+              aria-controls="mobile-menu"
               aria-label={open ? "Close menu" : "Open menu"}
-              className="min-h-[44px] min-w-[44px] p-2 text-sm uppercase tracking-[0.2em] text-text-primary md:hidden"
+              className="min-h-[44px] min-w-[44px] p-2 text-sm uppercase tracking-[0.2em] text-text-primary lg:hidden"
             >
               {open ? "✕" : "☰"}
             </button>
@@ -97,7 +110,7 @@ export default function SiteHeader() {
         </div>
       </div>
       {open && (
-        <div className="border-t border-border md:hidden">
+        <div id="mobile-menu" className="max-h-[calc(100dvh-60px)] overflow-y-auto border-t border-border bg-background lg:hidden">
           <nav aria-label="Mobile" className="mx-auto max-w-6xl px-4 py-4">
             <ul>
               {LINKS.map((l) => (
@@ -106,7 +119,7 @@ export default function SiteHeader() {
                     href={l.href}
                     onClick={() => setOpen(false)}
                     aria-current={pathname === l.href ? "page" : undefined}
-                    className="block py-3 font-display text-3xl uppercase text-text-primary transition-colors hover:text-accent"
+                    className="block py-3 font-display text-2xl uppercase text-text-primary transition-colors hover:text-accent"
                   >
                     {l.label}
                   </Link>

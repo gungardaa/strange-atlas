@@ -1,5 +1,15 @@
 import { CATEGORIES, verifiedExhibits, type Exhibit } from "@/data/exhibits";
 
+// ponytail: precomputed once for 31 entries. Sort at render past ~200.
+export const orderedExhibits = [...verifiedExhibits].sort(
+  (a, b) =>
+    CATEGORIES.findIndex((c) => c.id === a.category) - CATEGORIES.findIndex((c) => c.id === b.category) ||
+    a.number - b.number,
+);
+
+// ponytail: one world view for map resets. Per-marker zoom stays on the exhibit.
+export const WORLD_VIEW = { id: "__world__", lon: 10, lat: 25, zoom: 2 };
+
 export function haversineKm(
   lon1: number,
   lat1: number,
@@ -52,7 +62,7 @@ export function toggleDiscovered(id: string): string[] {
 
 export function searchExhibits(q: string, category: string | Set<string> | null, tag?: string | null): Exhibit[] {
   const needle = q.trim().toLowerCase();
-  return verifiedExhibits.filter((e) => {
+  return orderedExhibits.filter((e) => {
     if (category instanceof Set ? category.size > 0 && !category.has(e.category) : category && e.category !== category)
       return false;
     if (tag && !e.tags.includes(tag)) return false;

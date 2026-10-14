@@ -11,7 +11,7 @@ const mono = IBM_Plex_Mono({ variable: "--font-mono", subsets: ["latin"], weight
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ardanareswara-strange-atlas.vercel.app"),
-  title: "The Strange Atlas",
+  title: { default: "The Strange Atlas", template: "%s - The Strange Atlas" },
   description: "An atlas of places that make you look twice at a map.",
   openGraph: {
     title: "The Strange Atlas",
@@ -42,7 +42,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteHeader />
         <div className="flex flex-1 flex-col">{children}</div>
         <footer className="border-t border-border">
-          <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:grid-cols-3">
+          <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-12 sm:grid-cols-2 sm:gap-6 lg:grid-cols-[1.2fr_1fr_1fr]">
             <div>
               <p className="font-display text-xl font-bold uppercase tracking-[0.2em] text-text-primary">
                 The Strange Atlas
@@ -88,7 +88,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </div>
           </div>
           <div className="border-t border-border">
-            <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-5 font-mono text-xs text-text-muted">
+            <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-5 font-mono text-xs text-text-muted sm:flex-row sm:items-center sm:justify-between">
               <p>© 2026 The Strange Atlas</p>
               <p>
                 Map data ©{" "}

@@ -24,7 +24,7 @@ export function ExhibitCard({ e, className = "" }: { e: Exhibit; className?: str
         </Link>
       </h3>
       <p className="mt-0.5 text-sm text-text-secondary">{e.countries.join(" · ")}</p>
-      <p className="mt-2 text-sm text-text-primary">{e.teaser}</p>
+      <p className="mt-2 line-clamp-3 min-h-[3.75rem] text-sm text-text-primary">{e.teaser}</p>
       <div className="mt-auto flex flex-wrap items-center gap-2 pt-3">
         <CategoryChip category={e.category} />
         <Link
@@ -52,8 +52,8 @@ function TimelineEventItem({ t }: { t: TimelineEvent }) {
 // ponytail: last event is the present state by convention. Toggle view only if asked.
 // Then and Now as a labeled spine. Nothing hides, so mobile needs no extra interaction.
 export function Timeline({ events }: { events: TimelineEvent[] }) {
-  const before = events.length > 1 ? events.slice(0, -1) : [];
-  const today = events.length > 1 ? events.slice(-1) : events;
+  const before = events.slice(0, -1);
+  const today = events.slice(-1);
   return (
     <Card as="section" aria-labelledby="then-now">
       <h2 id="then-now" className="font-display text-xl font-bold text-text-primary">

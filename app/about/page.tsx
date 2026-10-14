@@ -1,7 +1,7 @@
-import { Container, Divider, SectionHead } from "@/components/primitives";
+import { Container, SectionHead } from "@/components/primitives";
 
 export const metadata = {
-  title: "About | The Strange Atlas",
+  title: "About",
   description: "What this atlas is, how facts are checked, and key border terms.",
 };
 
@@ -20,7 +20,7 @@ export default function AboutPage() {
         </p>
       </section>
 
-      <Divider />
+      <hr className="border-border" />
 
       <section aria-labelledby="glossary">
         <SectionHead id="glossary" eyebrow="Five terms" title="Short glossary" />
@@ -56,7 +56,7 @@ export default function AboutPage() {
         </dl>
       </section>
 
-      <section aria-labelledby="facts-title" id="facts" className="scroll-mt-6">
+      <section aria-labelledby="facts-title" id="facts" className="scroll-mt-24">
         <SectionHead id="facts-title" eyebrow="Method" title="How facts are checked" />
         <ul className="mt-3 list-disc pl-5 text-sm text-text-primary">
           <li>Government, municipal, treaty, and official local pages come first.</li>

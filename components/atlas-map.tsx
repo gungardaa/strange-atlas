@@ -115,18 +115,22 @@ export default function AtlasMap({
     (async () => {
       const L = await import("leaflet");
       if (dead || !elRef.current || mapRef.current) return;
-      // ponytail: hard world bounds, no wrapped copies. Raise maxBounds past ±180 only if markers ever leave the world map.
+      // ponytail: lng fence at ±300, hard wall at 1.0. Every marker sits inside ±180.
+      // Lat stays ±90: Web Mercator has no tiles past 85.05°, widening it is meaningless.
       const map = L.map(elRef.current, {
         worldCopyJump: false,
         zoomControl: false,
         minZoom: 2,
         maxBounds: L.latLngBounds(
-          L.latLng(-90, -180),
-          L.latLng(90, 180),
+          L.latLng(-90, -300),
+          L.latLng(90, 300),
         ),
         maxBoundsViscosity: 1.0,
       }).setView([25, 10], 2);
-      L.control.zoom({ position: "topright" }).addTo(map);
+      // ponytail: position reads the live pointer, no resize listener. Second control only if a third corner is needed.
+      L.control
+        .zoom({ position: window.matchMedia("(pointer: coarse)").matches ? "bottomright" : "topright" })
+        .addTo(map);
       mapRef.current = map;
       addTiles(L, map, false);
       map.attributionControl.setPrefix(false);

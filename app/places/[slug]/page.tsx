@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { exhibitBySlug, verifiedExhibits } from "@/data/exhibits";
-import { formatKm, nearbyExhibits } from "@/lib/utils";
+import { formatKm, nearbyExhibits, orderedExhibits } from "@/lib/utils";
 import { CategoryChip, ExhibitCard, ExhibitId, Timeline } from "@/components/exhibit";
 import { DiscoverButton } from "@/components/ui";
 import { ArrowRightIcon } from "@/components/icons";
@@ -17,7 +17,7 @@ export async function generateMetadata(props: PageProps<"/places/[slug]">) {
   const e = exhibitBySlug(slug);
   if (!e) return { title: "Off the map" };
   return {
-    title: `${e.title} | The Strange Atlas`,
+    title: e.title,
     description: e.teaser,
     alternates: { canonical: `/places/${e.slug}` },
   };
@@ -29,13 +29,13 @@ export default async function PlacePage(props: PageProps<"/places/[slug]">) {
   if (!e) notFound();
 
   const nearby = nearbyExhibits(e, 3);
-  const next = verifiedExhibits[(verifiedExhibits.indexOf(e) + 1) % verifiedExhibits.length];
+  const next = orderedExhibits[(orderedExhibits.indexOf(e) + 1) % orderedExhibits.length];
 
   return (
     <Container width="prose" as="main" id="content" className="flex flex-1 flex-col gap-8 py-8">
       <header>
         <ExhibitId n={e.number} />
-        <h1 className="mt-1 font-display text-4xl font-bold tracking-tight text-text-primary">{e.title}</h1>
+        <h1 className="mt-1 font-display text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">{e.title}</h1>
         <p className="mt-1 text-text-secondary">{e.subtitle}</p>
         <Eyebrow>
           {e.locationPrecision === "point-of-interest"
@@ -52,7 +52,7 @@ export default async function PlacePage(props: PageProps<"/places/[slug]">) {
               key={t}
               href={`/atlas#tag=${encodeURIComponent(t)}`}
               aria-label={`Follow the ${t} thread on the map`}
-              className="tappable inline-flex items-center rounded-sm transition-colors hover:border-accent"
+              className="tappable inline-flex items-center rounded-sm transition-colors"
             >
               <Chip>{t}</Chip>
             </Link>
@@ -63,7 +63,7 @@ export default async function PlacePage(props: PageProps<"/places/[slug]">) {
       <p className="border-l-4 border-accent pl-4 text-lg font-medium text-text-primary">{e.leadFact}</p>
 
       <div>
-        <div className="crosshair h-72 overflow-hidden rounded-md border border-border">
+        <div className="crosshair h-56 overflow-hidden rounded-md border border-border sm:h-64 lg:h-80">
           <DetailMap exhibit={e} />
         </div>
         <Eyebrow>Pin is approximate and marks a point of interest, not a legal boundary.</Eyebrow>
@@ -116,24 +116,33 @@ export default async function PlacePage(props: PageProps<"/places/[slug]">) {
       )}
 
       <section aria-labelledby="sources">
-        <h2 id="sources" className="font-display text-xl font-bold text-text-primary">
-          Sources and further reading
+        <Eyebrow>Selected references</Eyebrow>
+        <h2 id="sources" className="mt-1 font-display text-xl font-bold text-text-primary">
+          Find out more
         </h2>
-        <ul className="mt-2 flex flex-col gap-2">
+        <ul className="mt-2 divide-y divide-border border-y border-border">
           {e.sources.map((s) => (
-            <li key={s.url} className="rounded-md border border-border bg-surface p-3 text-sm">
+            <li key={s.url}>
               <a
                 href={s.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-semibold text-text-primary underline decoration-accent decoration-2 underline-offset-2"
+                className="group grid grid-cols-[1.5rem_1fr] gap-2 py-3"
               >
-                {s.publisher} — {s.title}
+                <ArrowRightIcon className="mt-1 transition-transform group-hover:translate-x-0.5" />
+                <span>
+                  <span className="block font-mono text-xs uppercase tracking-[0.2em] text-accent">
+                    {s.publisher}
+                  </span>
+                  <span className="mt-0.5 block font-display text-lg font-bold leading-snug text-text-primary transition-colors group-hover:text-accent">
+                    {s.title}
+                  </span>
+                  <span className="mt-0.5 block truncate font-mono text-xs text-text-muted">
+                    {new URL(s.url).hostname.replace(/^www\./, "")} ↗
+                    {s.language && s.language !== "English" ? ` · in ${s.language}` : ""}
+                  </span>
+                </span>
               </a>
-              {s.language && s.language !== "English" && (
-                <span className="ml-2 text-xs text-text-muted">(in {s.language})</span>
-              )}
-              <span className="block text-xs text-text-muted">Supports. {s.supports.join(". ")}</span>
             </li>
           ))}
         </ul>
@@ -143,7 +152,7 @@ export default async function PlacePage(props: PageProps<"/places/[slug]">) {
         <h2 id="nearby" className="font-display text-xl font-bold text-text-primary">
           Nearby discoveries
         </h2>
-        <div className="mt-3 grid gap-3 md:grid-cols-3">
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {nearby.map(({ exhibit, km }) => (
             <div key={exhibit.id} className="flex flex-col">
               <div className="flex-1">
@@ -159,7 +168,7 @@ export default async function PlacePage(props: PageProps<"/places/[slug]">) {
 
       <div className="flex flex-col gap-2">
         <Eyebrow>Up next. {next.title}</Eyebrow>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap">
           <Link href={`/places/${next.slug}`} className={btnClasses("primary", "md")}>
             Next discovery <ArrowRightIcon />
           </Link>
