@@ -1,69 +1,102 @@
-import Image from "next/image";
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { verifiedExhibits } from "@/data/exhibits";
+import { getDiscovered, populatedCategories, surprisePick } from "@/lib/utils";
+import { ExhibitCard } from "@/components/exhibit";
+import { DiceIcon, glyphFor } from "@/components/icons";
+import { btnClasses, Button, Card, Container, Divider, Eyebrow, SectionHead } from "@/components/primitives";
 
 export default function Home() {
+  const router = useRouter();
+  const featured = verifiedExhibits.filter((e) => e.featured).slice(0, 3);
+  const goRandom = () => {
+    const e = surprisePick(getDiscovered());
+    router.push(`/places/${e.slug}`);
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <Container width="page" as="main" id="content" className="flex flex-1 flex-col gap-10 py-6 md:py-10">
+      <section className="grid items-center gap-8 md:grid-cols-2">
+        <div>
+          <Eyebrow>A curious atlas · {verifiedExhibits.length} exhibits</Eyebrow>
+          <h1 className="mt-2 font-display text-[clamp(2.5rem,6vw,4.5rem)] font-bold leading-none tracking-tight text-text-primary">
+            The Strange Atlas
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mt-3 text-lg text-text-secondary">
+            An atlas of places that make you look twice at a map.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link href="/atlas" className={btnClasses("primary", "md")}>
+              Explore the atlas
+            </Link>
+            <Button variant="secondary" size="md" onClick={goRandom}>
+              <DiceIcon /> Find me something strange
+            </Button>
+          </div>
+          <p className="mt-4 font-mono text-xs text-text-muted">
+            20.5°N 10.5°E · WORLD VIEW · ALL MARKERS LIVE
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div aria-hidden className="graticule crosshair relative hidden overflow-hidden rounded-md border border-border bg-surface-secondary p-6 md:block">
+          <div className="flex h-44 items-center justify-center gap-8">
+            {populatedCategories.slice(0, 3).map((c) => (
+              <span key={c.id}>{glyphFor(c.id, c.color, "h-6 w-6")}</span>
+            ))}
+          </div>
+          <p className="text-center font-mono text-[11px] tracking-widest text-text-muted">
+            FIG. 01 · MARKER SURVEY
+          </p>
         </div>
-      </main>
-    </div>
+      </section>
+
+      <section aria-labelledby="featured">
+        <SectionHead id="featured" eyebrow="Field selection · three oddities" title="Featured discoveries" />
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          {featured.map((e) => (
+            <ExhibitCard key={e.id} e={e} />
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="rabbithole">
+        <SectionHead id="rabbithole" eyebrow={`${populatedCategories.length} threads`} title="Choose a rabbit hole" />
+        <div className="mt-4 flex flex-wrap gap-2">
+          {populatedCategories.map((c) => (
+            <Link key={c.id} href={`/atlas#${c.id}`} className={btnClasses("secondary", "sm")}>
+              {glyphFor(c.id, c.color)}
+              {c.label}
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <Card as="section" crosshair className="text-center" aria-labelledby="prompt">
+        <h2 id="prompt" className="font-display text-xl font-bold text-text-primary">
+          You have landed somewhere unusual.
+        </h2>
+        <p className="mt-1 text-text-secondary">Open a random exhibit or test yourself in the Hunt.</p>
+        <div className="mt-4 flex flex-wrap justify-center gap-3">
+          <Button variant="primary" size="md" onClick={goRandom}>
+            Show me
+          </Button>
+          <Link href="/hunt" className={btnClasses("secondary", "md")}>
+            Start the Hunt
+          </Link>
+        </div>
+      </Card>
+
+      <section className="text-sm text-text-muted">
+        <Divider className="mb-4" />
+        <p>
+          Every exhibit links to its sources. Read how facts are checked in{" "}
+          <Link href="/about" className="underline">
+            About
+          </Link>
+          .
+        </p>
+      </section>
+    </Container>
   );
 }

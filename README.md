@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# The Strange Atlas
 
-## Getting Started
+Live at https://ardanareswara-strange-atlas.vercel.app.
 
-First, run the development server:
+An interactive atlas of places where borders, politics, history, and time produce surprising results. Built with Next.js App Router, TypeScript, Tailwind CSS v4, and vanilla Leaflet over CARTO basemaps.
+
+## Scripts
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run dev     # local development
+npm run lint    # eslint
+npm run build   # production build (also runs type checking)
+npm start       # serve the production build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Content model
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+All 31 exhibits live in `data/exhibits.ts` as typed records (coordinates are
+approximate map anchors in `[longitude, latitude]` order, never legal
+boundaries). Only `verificationStatus: "verified"` entries render publicly.
+Every factual claim maps to a source via `sources[].supports`, with
+`lastVerified` re-stamped on each evidence pass. The atlas, detail pages,
+Hunt, Surprise Me, and nearby recommendations all read the same dataset.
+Discovery progress and theme choice persist in `localStorage`; there is no
+database and no account.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Map
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Vanilla Leaflet (no wrapper), loaded client-side only. OpenStreetMap standard
+tiles are the keyless primary because keyless CARTO endpoints return error
+images in enforcing regions. Set `NEXT_PUBLIC_CARTO_KEY` (free key from
+carto.com/basemaps) to restore styled light/dark CARTO basemaps that switch
+with the site theme — never a CSS filter on tiles. If styled tiles fail, the
+map falls back to OSM automatically with matching attribution. Optional full
+overrides: `NEXT_PUBLIC_MAP_TILES_LIGHT` and `NEXT_PUBLIC_MAP_TILES_DARK`. Map data © OpenStreetMap contributors,
+basemap © CARTO; attribution stays visible on the map and in the footer.
+Review CARTO's current basemap terms and fair-use limits before launch.
